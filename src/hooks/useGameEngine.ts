@@ -33,6 +33,7 @@ import type {
 } from "../game/types";
 import { useDocumentVisibility } from "./useDocumentVisibility";
 import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
+import type { SoundEvent } from "../game/sound";
 
 export type EngineStatus =
   | "loading"
@@ -52,9 +53,10 @@ const APP_TITLE = "MIRA // EXIT";
 
 type Options = {
   notify: (title: string, body: string) => void;
+  play: (event: SoundEvent, speaker?: StoryNode["speaker"], status?: import("../game/types").ConnectionStatus) => void;
 };
 
-export function useGameEngine({ notify }: Options) {
+export function useGameEngine({ notify, play }: Options) {
   const [state, setState] = useState<GameState>(() => createInitialState());
   const [status, setStatus] = useState<EngineStatus>("loading");
   const [incoming, setIncoming] = useState<Incoming>(null);
@@ -83,6 +85,8 @@ export function useGameEngine({ notify }: Options) {
   const actionLockRef = useRef<boolean>(false);
   const notifyRef = useRef(notify);
   notifyRef.current = notify;
+  const playRef = useRef(play);
+  playRef.current = play;
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((t) => clearTimeout(t));
@@ -134,8 +138,16 @@ export function useGameEngine({ notify }: Options) {
     return "connected";
   }, [currentNode, status, state.currentNodeId]);
 
+  const prevConnRef = useRef<ConnectionStatus>(connectionStatus);
+  useEffect(() => {
+    if (prevConnRef.current === connectionStatus) return;
+    if (connectionStatus === "intercepted") playRef.current("intercepted");
+    else if (connectionStatus === "offline") playRef.current("offline");
+    prevConnRef.current = connectionStatus;
+  }, [connectionStatus]);
+
   const registerMessage = useCallback(
-    (entry: GameState["history"][number]) => {
+    (entry: GameState["history"][number], nodeId: string) => {
       setState((prev) => ({
         ...prev,
         history: [...prev.history, entry],
@@ -143,6 +155,18 @@ export function useGameEngine({ notify }: Options) {
       }));
       if (entry.speaker !== "player") {
         setAnnouncement(`${entry.speaker.toUpperCase()}: ${entry.text}`);
+        const node = story[nodeId];
+        if (node?.effects?.glitch || node?.effects?.corrupted) {
+          playRef.current("glitch", entry.speaker);
+        } else {
+          playRef.current("incoming", entry.speaker);
+        }
+        if (node?.effects?.actTransition) {
+          playRef.current("actTransition", entry.speaker);
+        }
+        if (node?.ending) {
+          playRef.current("ending", entry.speaker);
+        }
         if (hiddenRef.current) {
           setUnread((u) => Math.min(u + 1, 9));
           notifyRef.current(
@@ -235,7 +259,7 @@ export function useGameEngine({ notify }: Options) {
       if (runId !== runIdRef.current) return;
       setIncoming(null);
       const entry = makeHistoryEntry(nodeId, node.speaker, text, Date.now());
-      registerMessage(entry);
+      registerMessage(entry, nodeId);
       resolveOutgoing(node, stateRef.current);
     };
 
@@ -298,6 +322,7 @@ export function useGameEngine({ notify }: Options) {
         history: [...stateRef.current.history, playerEntry],
       });
       setAnnouncement(`YOU: ${label}`);
+      playRef.current("outgoing");
       setStatus("delivering");
     },
     [],
@@ -323,6 +348,7 @@ export function useGameEngine({ notify }: Options) {
       updatedAt: Date.now(),
     }));
     setAnnouncement(`YOU: ${name}`);
+    playRef.current("outgoing");
     setStatus("delivering");
   }, []);
 

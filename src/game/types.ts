@@ -112,6 +112,10 @@ export type Locale = {
       pacingFast: string;
       pacingDescStandard: string;
       pacingDescFast: string;
+      sound: string;
+      soundEnable: string;
+      soundDisable: string;
+      soundDesc: string;
       restart: string;
       restartConfirm: string;
       restartConfirmYes: string;

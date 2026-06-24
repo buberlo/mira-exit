@@ -256,6 +256,24 @@ explicit action in Settings. When enabled, the app notifies only when the tab is
 hidden and only for non-player messages, once per message. Denied or unsupported
 permissions are handled gracefully.
 
+## Terminal sound
+
+Sound is off by default. Enable it through Settings → Enable terminal sound.
+Sounds are generated programmatically via the Web Audio API — no audio files
+are loaded. The AudioContext is created and resumed only after the user
+explicitly enables sound, complying with browser autoplay policies.
+
+Sound cues include:
+- Per-speaker incoming message tones (MIRA, CONTROL, system — distinct pitches)
+- Outgoing confirmation when the player makes a choice
+- Glitch/interference burst for corrupted messages
+- Low drone for CONTROL interception
+- Ascending tones for act transitions
+- Descending tones for endings
+
+The sound preference is persisted in `localStorage` independently of the game
+state.
+
 ## Accessibility
 
 - Semantic landmarks (`header`, `main`, `dialog`) and ARIA labels.

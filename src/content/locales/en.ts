@@ -27,6 +27,10 @@ export const en: Locale = {
       pacingFast: "Fast",
       pacingDescStandard: "Full delays between messages. Recommended for first contact.",
       pacingDescFast: "Reduced delays. Quickens the pace without skipping content.",
+      sound: "Sound",
+      soundEnable: "Enable terminal sound",
+      soundDisable: "Disable terminal sound",
+      soundDesc: "Subtle audio cues for incoming messages, interference, and transitions.",
       restart: "Restart transmission",
       restartConfirm:
         "Restarting will erase this transmission, including all history and progress. This cannot be undone. Continue?",

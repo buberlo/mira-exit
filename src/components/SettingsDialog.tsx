@@ -7,9 +7,13 @@ type Props = {
   notificationState: NotificationState;
   notificationsEnabled: boolean;
   pacing: PacingMode;
+  soundSupported: boolean;
+  soundEnabled: boolean;
   onEnableNotifications: () => void;
   onDisableNotifications: () => void;
   onChangePacing: (mode: PacingMode) => void;
+  onEnableSound: () => void;
+  onDisableSound: () => void;
   onRestart: () => void;
   onClose: () => void;
 };
@@ -19,9 +23,13 @@ export function SettingsDialog({
   notificationState,
   notificationsEnabled,
   pacing,
+  soundSupported,
+  soundEnabled,
   onEnableNotifications,
   onDisableNotifications,
   onChangePacing,
+  onEnableSound,
+  onDisableSound,
   onRestart,
   onClose,
 }: Props) {
@@ -131,6 +139,32 @@ export function SettingsDialog({
                 ? t.pacingDescStandard
                 : t.pacingDescFast}
             </p>
+          </div>
+
+          <div className="dialog__row">
+            <span className="dialog__label">{t.sound}</span>
+            {soundSupported ? (
+              soundEnabled ? (
+                <button
+                  className="dialog__btn"
+                  type="button"
+                  onClick={onDisableSound}
+                >
+                  {t.soundDisable}
+                </button>
+              ) : (
+                <button
+                  className="dialog__btn dialog__btn--primary"
+                  type="button"
+                  onClick={onEnableSound}
+                >
+                  {t.soundEnable}
+                </button>
+              )
+            ) : (
+              <p className="dialog__desc">Unsupported in this browser.</p>
+            )}
+            <p className="dialog__desc">{t.soundDesc}</p>
           </div>
 
           <div className="dialog__row">

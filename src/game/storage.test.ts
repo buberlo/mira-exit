@@ -6,11 +6,13 @@ import {
   detectAndFlagMigration,
   getNotificationPreference,
   getPacingPreference,
+  getSoundPreference,
   loadOrReset,
   loadState,
   saveState,
   setNotificationPreference,
   setPacingPreference,
+  setSoundPreference,
   storageKeyFor,
   validateState,
   wasMigrated,
@@ -211,6 +213,23 @@ describe("pacing preference", () => {
     expect(getPacingPreference()).toBe("fast");
     setPacingPreference("standard");
     expect(getPacingPreference()).toBe("standard");
+  });
+});
+
+describe("sound preference", () => {
+  beforeEach(() => {
+    mockLocalStorage();
+  });
+
+  it("defaults to disabled", () => {
+    expect(getSoundPreference()).toBe(false);
+  });
+
+  it("persists and reads the preference", () => {
+    setSoundPreference(true);
+    expect(getSoundPreference()).toBe(true);
+    setSoundPreference(false);
+    expect(getSoundPreference()).toBe(false);
   });
 });
 

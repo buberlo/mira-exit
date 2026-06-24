@@ -9,6 +9,7 @@ import type { GameState, HistoryEntry, PacingMode, Stats } from "./types";
 const STORAGE_PREFIX = "mira-exit:";
 const NOTIFICATIONS_KEY = `${STORAGE_PREFIX}notifications`;
 const PACING_KEY = `${STORAGE_PREFIX}pacing`;
+const SOUND_KEY = `${STORAGE_PREFIX}sound`;
 const MIGRATION_KEY = `${STORAGE_PREFIX}migrated`;
 
 function safeParse<T>(raw: string | null): T | null {
@@ -163,6 +164,24 @@ export function setPacingPreference(mode: PacingMode): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(PACING_KEY, mode);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function getSoundPreference(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.localStorage.getItem(SOUND_KEY) === "true";
+}
+
+export function setSoundPreference(enabled: boolean): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (enabled) {
+      window.localStorage.setItem(SOUND_KEY, "true");
+    } else {
+      window.localStorage.removeItem(SOUND_KEY);
+    }
   } catch {
     /* ignore */
   }

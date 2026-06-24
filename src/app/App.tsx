@@ -9,9 +9,11 @@ import { story } from "../content/story/en";
 import { ENDINGS, type EndingId } from "../game/endings";
 import { useGameEngine } from "../hooks/useGameEngine";
 import { useNotifications } from "../hooks/useNotifications";
+import { useSound } from "../hooks/useSound";
 
 export function App() {
   const notifications = useNotifications();
+  const sound = useSound();
   const {
     state,
     status,
@@ -30,7 +32,7 @@ export function App() {
     restart,
     begin,
     changePacing,
-  } = useGameEngine({ notify: notifications.notify });
+  } = useGameEngine({ notify: notifications.notify, play: sound.play });
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [confirmRestart, setConfirmRestart] = useState(false);
@@ -193,9 +195,13 @@ export function App() {
           notificationState={notifications.permission}
           notificationsEnabled={notifications.enabled}
           pacing={pacing}
+          soundSupported={sound.supported}
+          soundEnabled={sound.enabled}
           onEnableNotifications={notifications.requestEnable}
           onDisableNotifications={notifications.disable}
           onChangePacing={changePacing}
+          onEnableSound={sound.enable}
+          onDisableSound={sound.disable}
           onRestart={() => {
             setSettingsOpen(false);
             setConfirmRestart(true);
